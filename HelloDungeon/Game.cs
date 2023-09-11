@@ -18,9 +18,9 @@ namespace HelloDungeon
         /// <summary>
         /// The starting room where the player gives their name, and has their first encounter.
         /// </summary>
-        int GetInput(string description, string option1, string option2)
+        string GetInput(string description, string option1, string option2)
         {
-
+            input = "";
             //While input is not 1 or 2 display the options
             while (input != "1" && input != "2")
             {
@@ -56,7 +56,7 @@ namespace HelloDungeon
                 Console.Clear();
             }
 
-            return inputReceived;
+            return input;
         }
         void Room1()
         {
@@ -69,24 +69,25 @@ namespace HelloDungeon
             Console.Clear();
 
             //Display text for the first encounter, and store the players decision
-            int input = GetInput("You've been approached by a traveler!! " +
+            string input = GetInput("You've been approached by a traveler!! " +
                 "\n They offer you a potion. Do you accept?","Yes", "No" );
            
             //If the player drinks the potion...
-            if (input == 1)
+            if (input == "1")
             {
                 //...kill the player
                 Console.WriteLine("It was posion!! Ya dead shuuuunnnnn");
                 playerIsAlive = false;
             }
             //Otherwise if they do not...
-            else if (input == 2)
+            else if (input == "2")
             {
                 //...display text to let the player know that they survived the first room
                 Console.WriteLine("You decide to follow your gut and decline. You move on to the next area.");
                 Console.ReadKey(true);
                 currentArea = 2;
             }
+            input = "";
         }
 
         /// <summary>
@@ -129,7 +130,7 @@ namespace HelloDungeon
                 input = Console.ReadLine();
 
                 //If the player answered correctly...
-                if (input.ToLower() == "egg")
+                if (input.ToLower() == "egg" || input.ToLower() == "eggy")
                 {
                     //...print text for feedback and break the loop
                     Console.WriteLine("Congrats! You've gained immortality!");
@@ -143,16 +144,17 @@ namespace HelloDungeon
                     "you take 5 points of damage.");
                 Console.ReadKey();
                 health -= 5;
-            }
 
-            //If the player has died after guessing
-            if (health <= 0)
-            {
-                //...update the player state and print player feedback to the screen
-                playerIsAlive = false;
-                Console.WriteLine("You died...");
-                Console.ReadKey();
-                Console.Clear();
+                //If the player has died after guessing
+                if (health <= 0)
+                {
+                    //...update the player state and print player feedback to the screen
+                    playerIsAlive = false;
+                    Console.WriteLine("You died...");
+                    Console.ReadKey(true);
+                    Console.Clear();
+                    break;
+                }
             }
         }
 
@@ -161,11 +163,12 @@ namespace HelloDungeon
         /// </summary>
         void DisplayMainMenu()
         {
+            health = 20;
+            input = "";
             //Display question and store input
-            while (playerIsAlive == false)
+            while (playerIsAlive == false || currentArea == 3)
             {
-                inputReceived = 0;
-                inputReceived = GetInput("Would you like to play again?", "Yes", "No");
+                input = GetInput("Would you like to play again?", "Yes", "No");
 
                 //If the player decides to restart...
                 if (inputReceived == 1)
@@ -181,6 +184,7 @@ namespace HelloDungeon
                 {
                     //...set game over to be true
                     gameOver = true;
+                    return;
                 }
             }
         }
@@ -222,14 +226,15 @@ namespace HelloDungeon
                 else if (currentArea == 3)
                 {
                     Room3();
+                    DisplayMainMenu();
                 }
-            }
                 //If the player lost or beat the game...
-                if (playerIsAlive == false || currentArea == 3)
+                if (playerIsAlive == false)
                 {
                     //...print main menu
                     DisplayMainMenu();
                 }
+            }
         }
     }
 }
